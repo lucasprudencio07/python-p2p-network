@@ -53,6 +53,18 @@ class Peer():
         logging.info('Peer {0} is listening.'.format(self.id))
         self.close_socket_connection()
 
+    def run(self):
+        while True:
+            try:
+                logging.info('Peer {0} is set up, waiting for new connections.')
+                connection, client_address = self.sock.accept()
+                print(connection, client_address)
+                inbound_peer = PeerConnection(connection, client_address)
+                if connection:
+                    self.sock.close()
+                    logging.info('Original peer closed')
+            except socket.timeout:
+                pass
     def get_message_count_send(self):
         return self.message_count_send
 
@@ -68,7 +80,7 @@ class Peer():
         logging.info('Peer {0} has closed the connection.'.format(self.id))
 
     def connect_with_peer(self, host, port):
-        validate_new_peer_connection(host)
+        self.validate_new_peer_connection(host)
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.connect((host, port))
@@ -77,9 +89,10 @@ class Peer():
             self.nodesOut.append(outbound_peer)
 
         except Exception as e:
-            self.dprint("TcpServer.connect_with_node: Could not connect with node. (" + str(e) + ")")
+            logging.critical("Could not connect with node!")
+            sys.exit(0)
 
-    def validate_new_peer_connection(host):
+    def validate_new_peer_connection(self, host):
         if host == self.host:
             logging.critical('Cannot stablish connection with this own peer! Aborting.')
             sys.exit(0)
@@ -138,4 +151,5 @@ def get_ip():
 
 peer = Peer()
 peer.init_server()
-peer.connect_with_peer('192.168.0.40')
+
+#peer.connect_with_peer('192.168.0.40', 5000)
