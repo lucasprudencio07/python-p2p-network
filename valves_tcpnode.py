@@ -51,7 +51,7 @@ class Peer():
         # Enables the server to accept connections | With only 1 to refuse before disconnect
         self.sock.listen(1)
         logging.info('Peer {0} is listening.'.format(self.id))
-        self.close_socket_connection()
+        #self.close_socket_connection()
 
     def run(self):
         while True:
